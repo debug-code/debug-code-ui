@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>debug-code</title>
+    <link rel="stylesheet" href="/static/css/basis.css">
+    <link rel="stylesheet" href="/static/css/geekerblog.css">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/fonts/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <!-- <link rel="stylesheet" href="/static/Plugin/Editor.md/css/editormd.css" /> -->
+    <style>
+
+
+
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="head">
+        <a class="head-logo-text" href="#">Geeker Blog</a>
+    </div>
+
+    <div class="content">
+
+        <!--			list-->
+        <div class="container">
+
+            <ul class="content-list" id="content_list">
+            </ul>
+
+        </div>
+
+        <div class="more" id="more"><div class="next">more</div></div>
+    </div>
+
+    <footer class="footer">
+        <div class="copyright">
+            <p>© 2019
+                <a href="http://geekerblog.com">Alex</a>, All rights reserved.
+            </p>
+        </div>
+    </footer>
+ 
+    <script src="/static/js/jquery-1.11.2.min.js"></script>
+    <script src="/static/js/common.js" charset="utf-8"></script>
+    <script src="/static/Plugin/layer/layer.js"></script>
+    <script>
+
+        let pages = 0
+        let limit = 10
+        let url = 'http://localhost:8090/open/articles?offset='+pages * limit+'&limit='+limit
+        let counts = 0
+        ajax('GET', url,"",null, function(data){
+            // console.log("data",data)
+            let list =  data.data.list
+            counts = data.data.counts
+            for(let index in list) {  
+                // console.log("index",index,list[index]); 
+                let content  = list[index].content_html.split("</blockquote>")[0]+"</blockquote>"
+                let tags = list[index].tag.split(",")
+                let tag = "" 
+                for(let index in tags) { 
+                    tag += `<a class="tag-name" href="">`+tags[index]+`</a>`
+                }
+
+                let li = `<li class="content-list-item">
+                <div class="article">
+                    <p><br></p>
+                    <h1 class="title"><a href="`+"blog/"+ list[index].uid+`">`+ list[index].title +`</a></h1>
+                    <article>
+                        <div>Jun 18, 2017</div>
+                        <div>
+                            `+content+`
+                        </div>
+                    </article>
+                </div>
+                <div class="tags">
+							<span class="tag-list"><i class="fa fa-tags" aria-hidden="true"></i>
+								`+tag+`
+							</span>
+                    <span class="tag-list"><i class="fa fa-heart" aria-hidden="true"></i>`+list[index].like+` </span>
+                    
+                </div>
+            </li>` 
+            //<span class="tag-list"><i class="fa fa-comment" aria-hidden="true"></i>`+data.data[index].like+`  </span>
+
+                document.getElementById("content_list").innerHTML+=li;
+                // $("#content_list").append(li)
+            }; 
+            pages++;
+           
+        })
+    
+        $(".content").on("click", ".more", function () {
+
+            if (pages * limit > counts){ 
+                layer.msg("没有更多了。",{time: 500});
+                return
+            }
+
+            let url1 = 'http://localhost:8090/open/articles?offset='+pages * limit+'&limit='+limit
+            ajax('GET', url1,"",null, function(data){
+            // console.log("data",data)
+                let list =  data.data.list
+                for(let index in list) {  
+                    // console.log("index",index,list[index]); 
+                    let content  = list[index].content_html.split("</blockquote>")[0]+"</blockquote>"
+                    let tags = list[index].tag.split(",")
+                    let tag = "" 
+                    for(let index in tags) { 
+                        tag += `<a class="tag-name" href="">`+tags[index]+`</a>`
+                    }
+
+                    let li = `<li class="content-list-item">
+                    <div class="article">
+                        <p><br></p>
+                        <h1 class="title"><a href="`+"blog/"+ list[index].uid+`">`+ list[index].title +`</a></h1>
+                        <article>
+                            <div>Jun 18, 2017</div>
+                            <div>
+                                `+content+`
+                            </div>
+                        </article>
+                    </div>
+                    <div class="tags">
+                                <span class="tag-list"><i class="fa fa-tags" aria-hidden="true"></i>
+                                    `+tag+`
+                                </span>
+                        <span class="tag-list"><i class="fa fa-heart" aria-hidden="true"></i>`+list[index].like+` </span>
+                        
+                    </div>
+                    </li>` 
+                    //<span class="tag-list"><i class="fa fa-comment" aria-hidden="true"></i>`+data.data[index].like+`  </span>
+
+                    document.getElementById("content_list").innerHTML+=li;
+                }; 
+                pages++;
+            })
+    
+        })
+
+    </script>
+</body>
+
+</html>

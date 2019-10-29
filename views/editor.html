@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>editor</title>
+        <link rel="stylesheet" href="/static/Plugin/Editor.md/css/editormd.css" />
+        <link rel="stylesheet" href="/static/Plugin/layui/css/layui.css">
+        <link rel="stylesheet" href="/static/css/editor.css">
+
+    </head>
+    <body>
+        <div class="title-box">
+            <!-- @*<a href="#" onclick="t()">ddd</a>*@ -->
+            <input id="title" type="text" name="Title" class="title-input" placeholder="无标题文章（点击修改）" />
+            <input id="tag" type="text" name="Type" class="type" placeholder="文章标签，逗号分隔" />
+            <div class="layui-btn save">
+                保存
+            </div>
+        </div>
+        <div id="test-editor" class="box">
+            <textarea style="display:none;"></textarea>
+            <textarea style="display:none;"></textarea>
+        </div>
+        <script src="/static/js/jquery-1.11.2.min.js"></script>
+        <script src="/static/Plugin/Editor.md/editormd.min.js"></script>
+        <script src="/static/Plugin/layer/layer.js"></script>
+        <script src="/static/js/common.js" charset="utf-8"></script>
+        <script type="text/javascript">
+           
+            var editor = editormd("test-editor", {
+                    // width  : "800px",
+                    // height : "800px",
+                    path   : "/static/Plugin/Editor.md/lib/",
+                    saveHTMLToTextarea:true
+            }); 
+            
+            if("<%-uuid%>"!= ""){
+                let uuid="<%-uuid%>"
+                let url = "http://127.0.0.1:8090/api/articles/"+uuid; // 要请求的地址 
+                let token = getCookie("token");
+                
+                ajax('GET', url, token,null, function(data){
+                    // console.log(data.data[0].content_markdown );
+                    editor.insertValue(data.data[0].content_markdown);
+                    // editor.insertValue (data.data[0].content_html);
+                    // editor.content_markdown  = data.data[0].content_markdown 
+                    document.getElementById("title").value = data.data[0].title;
+                    document.getElementById("tag").value = data.data[0].tag;
+				})
+            }
+            
+            $(".save").click(function(){
+                // console.log(editor.getMarkdown())
+                // console.log(editor.getHTML())
+                let title = document.getElementById("title").value;
+                let tag = document.getElementById("tag").value;
+                let url = "http://127.0.0.1:8090/api/articles"; // 要请求的地址 
+                let token = getCookie("token");
+                let jsonData = JSON.stringify({
+                    content_markdown:editor.getMarkdown(),
+                    content_html:editor.getPreviewedHTML(),
+                    title:title,
+                    tag:tag
+                });
+                ajax('POST', url, token,jsonData, function(data){
+                    console.log(data);
+                    // layer.alert('内容')
+                    if(data.code == 1){
+                        layer.msg('保存成功');
+
+                        setTimeout(function(){
+                            var obj = $(".active",window.parent.document);
+                        $(".active",window.parent.document).removeClass("active");
+                        $(".layui-show",window.parent.document).removeClass("layui-show");
+
+                        //获取前一个data-id
+                        var ifraid = obj.prev().attr("data-id");
+                        //获取当前的data-id
+                        var ifraId = obj.attr("data-id");
+
+                        console.log("ifraid",ifraid)
+
+                        //跳转标签
+                        obj.prev(".tab-title").addClass("active");
+
+                        //删除标签
+                        obj.remove();
+
+                        //删除iframe
+                        $("iframe",window.parent.document).each(function(){
+                            //alert($(this).attr("data-id"));
+                            let id =$(this).attr("data-id")
+                            console.log("id",id)
+                            if(id==ifraId)
+                            {
+                                console.log("ifraId",ifraId)
+                                $(this).parent(".layui-tab-item").remove();
+                                return false;
+                            }
+                            if(id==ifraid)
+                            {
+                                console.log("ifraid",ifraid)
+                                $(this).parent(".layui-tab-item").addClass("layui-show");
+                            } 
+                        });
+
+                        return false;
+                        }, 500);
+
+                        
+                    }else{
+                        layer.msg('保存失败');
+                    } 
+				})
+                
+             
+			 
+            })
+
+            function ajax(method, url,token,json, callback){
+				let xhr = new XMLHttpRequest(); 
+                xhr.open(method, url, true);
+                xhr.setRequestHeader('Authorization',token);
+				xhr.responseType = "json";
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState == 4 && xhr.status == 200) {
+						callback(xhr.response);
+					}
+                }
+                // xhr.onload = function() {}
+			    xhr.send(json);
+		}
+
+        </script>
+    </body>
+</html>

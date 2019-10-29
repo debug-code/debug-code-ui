@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>文章列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link rel="stylesheet" href="/static/Plugin/layui/css/layui.css">
+    <link href="/static/fonts/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
+
+    <style>
+        .table-box {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            top: 10px;
+            bottom: 10px;
+        }
+    </style>
+    <script src="/static/js/jquery-1.11.2.min.js"></script>
+
+
+</head>
+
+<body>
+    <div class="table-box">
+        <!--        <table class="layui-hide" id="test">-->
+
+        <!--        </table>-->
+        <table class="layui-table">
+
+            <thead>
+                <tr>
+                    <th>标题</th>
+                    <th>作者</th>
+                    <th>类型</th>
+                    <th>发布时间</th>
+                    <th>操作</th>
+
+                </tr>
+            </thead>
+
+            <tbody id="tableBody">
+                <!--                <tr>-->
+                <!--                    <td>测试</td>-->
+                <!--                    <td>www</td>-->
+
+                <!--                    <td>test</td>-->
+                <!--                    <td>1989-10-14</td>-->
+                <!--                    <td>待审核</td>-->
+                <!--                    <td>-->
+                <!--                        <button class="layui-btn" onclick="edit()"><i class="layui-icon"></i></button>-->
+                <!--                        <button class="layui-btn" onclick="del()"><i class="layui-icon"></i></button>-->
+                <!--                    </td>-->
+                <!--                </tr>-->
+
+            </tbody>
+
+        </table>
+        <div id="demo1"></div>
+    </div>
+
+
+    <script src="/static/Plugin/layer/layer.js"></script>
+    <script src="/static/Plugin/layui/layui.js" charset="utf-8"></script>
+    <script src="/static/js/jquery-1.11.2.min.js" charset="utf-8"></script>
+    <script src="/static/js/common.js" charset="utf-8"></script>
+    <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+    <script>
+        let pages
+        let token = getCookie("token")
+        reloadData()
+
+        function reloadData(){
+            url = 'http://localhost:8090/api/articles?offset=0&limit=10'
+        
+            
+            // console.log("token",token)
+            ajax('GET', url,token, function(data){
+                // console.info("data",data)
+                    pages = data["data"]["counts"]
+                    layui.use(['laypage', 'layer'], function () {
+                        var laypage = layui.laypage
+                            , layer = layui.layer;
+
+                        //总页数大于页码总数
+                        laypage.render({
+                            elem: 'demo1'
+                            , count: pages //数据总数
+                            , jump: function (obj) {
+
+                                let offset = (obj.curr - 1) * 10
+                                let limit = offset + 10
+                                //alert(number)
+                                url = 'http://localhost:8090/api/articles?offset=' + offset + '&limit=' + limit
+                                ajax('GET', url,token, function(data){ 
+                                        // console.info(data)
+                                        $("#tableBody").empty();
+                                        data["data"]["list"].forEach(function (value, index, array) {
+
+
+                                            var element = `<tr>
+                                                <td>`+ value["title"] + `</td>
+                                                <td>`+ value["type"] + `</td>
+
+                                                <td>`+ value["create_time"] + `</td>
+                                                <td>`+ value["id"] + `</td>
+                                                <td>
+                                                    <a class="layui-btn" data-work="browse" data-id="`+ value["uid"] + `" href= "#"><i class="layui-icon layui-icon-read"></i></a>
+                                                    <a class="layui-btn" data-work="edit" data-id="`+ value["uid"] + `" href= "#"><i class="layui-icon layui-icon-edit"></i></a>
+                                                    <a class="layui-btn" data-work="del" data-id="`+ value["uid"] + `" href="#"><i class="layui-icon layui-icon-delete"></i></a>
+                                                </td>
+                                            </tr>
+                                                `
+                                            $("#tableBody").append(element)
+                                        });
+                                
+                                        $(".layui-table").on("click", ".layui-btn", function () {
+                                            var work = $(this).attr("data-work");
+                                            var uid = $(this).attr("data-id");
+                                            if (work == "edit") {
+                                                edit(uid)
+                                            }else if(work == "browse"){
+                                                browse(uid)
+                                            } else {
+                                                del(uid)
+                                            }
+                                        })
+                                });
+                            
+                        }});
+
+
+                        
+
+                        
+                    });
+
+            })
+        };
+
+        function ajax(method, url,token, callback){
+				let xhr = new XMLHttpRequest(); 
+                xhr.open(method, url, true);
+                xhr.setRequestHeader('Authorization',token);
+				xhr.responseType = "json";
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState == 4 && xhr.status == 200) {
+						callback(xhr.response);
+					}
+			    }
+			    xhr.send();
+		}
+        
+        function edit(uid) {
+                        //alert("edit")
+                        //(id)
+                        //alert(parent.num)
+                        //$('.layui-tab-item', window.parent.document).add("dd")
+                        var ls = "文章编辑";
+                        var ifraUrl = "editor/"+uid;
+                        console.log(ifraUrl)
+                        var li = "<li class=\"tab-title\" lay-id=\"\" data-id=\"" + parent.num + "\">" +
+                            "<i class=\"layui-icon\">&#xe68e;</i> " +
+                            "<cite>" + ls+ "</cite>" +
+                            "<i class=\"layui-icon layui-unselect layui-tab-close\" >ဆ</i>" +
+                            "</li>";
+                        //alert(li)
+                        $(".layui-show", window.parent.document).removeClass("layui-show");
+                        var ifra = "<div class=\"layui-tab-item layui-show\">" +
+                            "<iframe src=\"" + ifraUrl + "\" style=\"border: none;\" data-id=\"" + parent.num + "\"></iframe>" +
+                            "</div>";
+                        //alert(id)
+                        $("#top_tabs", window.parent.document).append(li);
+
+                        $("#clildFrame", window.parent.document).append(ifra);
+
+                        $("li.tab-title", window.parent.document).each(function () {
+                            //alert($(this).attr("data-id"));
+                            if ($(this).attr("data-id") == parent.num) {
+                                $(".active", window.parent.document).removeClass("active");
+                                $(this).addClass("active");
+                                return false;
+                            }
+                        });
+
+
+                        parent.num += 1;
+                        //alert(parent.num)
+
+        }
+
+        function del(uid) {
+                    
+            let delUrl = 'http://localhost:8090/api/articles/'+uid;
+            ajax('DELETE', delUrl,token, function(data){
+                if (data["code"]== "1") {
+                    layer.msg("删除成功",{
+                        time: 800
+                    });
+                    // reloadData()
+                    setTimeout(reloadData,500);
+
+                } else {
+                    layer.msg("删除失败",{
+                        time: 800
+                    });
+                }
+            })
+        }
+
+        function  browse(uid){
+            var ls = "文章查看";
+            var ifraUrl = "blog/"+uid;
+            var li = "<li class=\"tab-title\" lay-id=\"\" data-id=\"" + parent.num + "\">" +
+                            "<i class=\"layui-icon\">&#xe68e;</i> " +
+                            "<cite>" + ls+ "</cite>" +
+                            "<i class=\"layui-icon layui-unselect layui-tab-close\" >ဆ</i>" +
+                            "</li>";
+                        //alert(li)
+            $(".layui-show", window.parent.document).removeClass("layui-show");
+            var ifra = "<div class=\"layui-tab-item layui-show\">" +
+                            "<iframe src=\"" + ifraUrl + "\" style=\"border: none;\" data-id=\"" + parent.num + "\"></iframe>" +
+                            "</div>";
+                        //alert(id)
+            $("#top_tabs", window.parent.document).append(li);
+
+            $("#clildFrame", window.parent.document).append(ifra);
+
+            $("li.tab-title", window.parent.document).each(function () {
+                            //alert($(this).attr("data-id"));
+                if ($(this).attr("data-id") == parent.num) {
+                    $(".active", window.parent.document).removeClass("active");
+                    $(this).addClass("active");
+                    return false;
+                }
+            });
+
+
+            parent.num += 1;
+        }
+
+    </script>
+
+    <script>
+        // layui.use('table', function(){
+        //   var table = layui.table;
+        // //, maxWidth: 100}
+        //   table.render({
+        //     elem: '#test'
+        //     ,url:'http://www.layui.com/demo/table/user'
+        //     ,cols: [[
+        //       {type:'checkbox'}
+        //       ,{field:'id',title: 'ID', sort: true}
+        //       ,{field:'username',title: '作者'}
+        //       ,{field:'sex',  title: '发布时间', sort: true}
+        //       ,{field:'experience', title: '点赞', sort: true}
+        //       ,{field:'score', title: '标签', sort: true}
+        //     ]]
+        //     ,page: true
+        //   });
+        // });
+    </script>
+
+</body>
+
+</html>

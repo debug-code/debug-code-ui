@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>login</title>
+		
+		<link href="/static/Plugin/GeekOnline/css/font-awesome.min.css" rel="stylesheet" />
+		<link href="/static/Plugin/GeekOnline/css/BeeBlog.css" rel="stylesheet" />
+		<link href="/static/Plugin/layui/css/layui.css" rel="stylesheet" />
+		<script src="/static/Plugin/GeekOnline/js/jquery-1.11.2.min.js"></script>
+		
+		<style>
+			body, html{
+				width:100%;
+				height:100%;
+				overflow: hidden;
+			}
+			.login-box{
+				width:400px;
+				height:200px;
+				/* border:1px solid red; */
+				margin: 0 auto;
+				position: absolute;
+				top:50%;
+				margin-top:-100px;
+				left:50%;
+				margin-left:-200px;
+			}
+			.input-width{
+				width:240px !important;
+			}
+			#login-btn{
+				width:100px !important;
+				margin: 0 auto;
+			}
+			.width-100{
+				width:100% !important;
+			}
+		</style>
+	</head>
+	<body>
+		
+		<div class="login-box">
+			<div class="layui-form-item">
+				<label class="layui-form-label">账号</label>
+				<div class="layui-input-inline input-width">
+					<input type="text" id="account" name="Iname" required lay-verify="required" placeholder="请输入账号" 
+					autocomplete="off" class="layui-input">
+				</div>
+				<!-- <div class="layui-form-mid layui-word-aux">定义镜像的名称</div> -->
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">密码</label>
+				<div class="layui-input-inline input-width">
+					<input type="password" id="pwd" name="Iname" required lay-verify="required" placeholder="请输入密码" 
+					autocomplete="off" class="layui-input">
+				</div>
+				<!-- <div class="layui-form-mid layui-word-aux">定义镜像的名称</div> -->
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block" id="login-btn">
+					<button class="layui-btn width-100" onclick="login()">登录</button> 
+				</div>
+			</div>
+		</div>
+		<canvas id="cas"></canvas>
+		
+		<!-- login -->
+		
+		<script> 
+			function login(){
+				let account = document.getElementById("account").value
+				let pwd = document.getElementById("pwd").value
+				console.log(account, pwd)
+				let url = 'http://127.0.0.1:8090/open/login'; 
+
+				jsonBbj = {
+                    account:account,
+                    passwd:pwd
+				}
+				json = JSON.stringify(jsonBbj)
+				ajax('POST', url, json, function(data){
+					// console.log(1,data);
+					let token = data["data"]["token"];
+					// console.log(data.data.token);
+					if (data.code =="1"){
+						document.cookie = "token="+token+";";
+						console.log(document.cookie )
+						window.location.href="/view/manage" 
+					}else{
+						alert("登录失败")
+					}
+					
+				})
+			}
+			
+			function ajax(method, url,json, callback){
+				let xhr = new XMLHttpRequest(); 
+				xhr.open(method, url, true);
+				xhr.responseType = "json";
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState == 4 && xhr.status == 200) {
+						callback(xhr.response);
+					}
+			    }
+			    xhr.send(json);
+			}
+		</script>
+		
+		
+		<!-- background -->
+		<script>
+		
+			//alert($("#login").attr("width"));
+			function boxChange(obj1,obj2){
+				var re = $("#"+obj1);
+				var add = $("#"+obj2);
+				re.removeClass("active");
+				add.addClass("active");
+			}
+		  //获得canvas
+		  var canvas = document.getElementById("cas");
+		  var ctx = canvas.getContext("2d");
+		
+		
+		  resize();
+		  window.onresize = resize;
+		  function resize() {
+		    canvas.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+		    canvas.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+		  }
+		  var RAF = (function() {
+		    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) {
+		          window.setTimeout(callback, 1000 / 60);
+		        };
+		  })();
+		  // 鼠标活动时，获取鼠标坐标
+		  var warea = {x: null, y: null, max: 20000};
+		  window.onmousemove = function(e) {
+		    e = e || window.event;
+		    warea.x = e.clientX;
+		    warea.y = e.clientY;
+		  };
+		  window.onmouseout = function(e) {
+		    warea.x = null;
+		    warea.y = null;
+		  };
+		  // 添加粒子
+		  // x，y为粒子坐标，xa, ya为粒子xy轴加速度，max为连线的最大距离
+		  var dots = [];
+		  for (var i = 0; i < 300; i++) {
+		    var x = Math.random() * canvas.width;
+		    var y = Math.random() * canvas.height;
+		    var xa = Math.random() * 2 - 1;
+		    var ya = Math.random() * 2 - 1;
+		    dots.push({
+		      x: x,
+		      y: y,
+		      xa: xa,
+		      ya: ya,
+		      max: 6000
+		    })
+		  }
+		  // 延迟100秒开始执行动画，如果立即执行有时位置计算会出错
+		  setTimeout(function() {
+		    animate();
+		  }, 100);
+		  // 每一帧循环的逻辑
+		  function animate() {
+		    ctx.clearRect(0, 0, canvas.width, canvas.height);
+		    // 将鼠标坐标添加进去，产生一个用于比对距离的点数组
+		    var ndots = [warea].concat(dots);
+		    dots.forEach(function(dot) {
+		      // 粒子位移
+		      dot.x += dot.xa;
+		      dot.y += dot.ya;
+		      // 遇到边界将加速度反向
+		      dot.xa *= (dot.x > canvas.width || dot.x < 0) ? -1 : 1;
+		      dot.ya *= (dot.y > canvas.height || dot.y < 0) ? -1 : 1;
+		      // 绘制点
+		      ctx.fillRect(dot.x - 0.5, dot.y - 0.5, 1, 1);
+		      // 循环比对粒子间的距离
+		      for (var i = 0; i < ndots.length; i++) {
+		        var d2 = ndots[i];
+		        if (dot === d2 || d2.x === null || d2.y === null) continue;
+		        var xc = dot.x - d2.x;
+		        var yc = dot.y - d2.y;
+		        // 两个粒子之间的距离
+		        var dis = xc * xc + yc * yc;
+		        // 距离比
+		        var ratio;
+		        // 如果两个粒子之间的距离小于粒子对象的max值，则在两个粒子间画线
+		        if (dis < d2.max) {
+		          // 如果是鼠标，则让粒子向鼠标的位置移动
+		        //   if (d2 === warea && dis > (d2.max / 2)) {
+		        //     dot.x -= xc * 0.03;
+		        //     dot.y -= yc * 0.03;
+		        //   }
+		          // 计算距离比
+		          ratio = (d2.max - dis) / d2.max;
+		          // 画线
+		          ctx.beginPath();
+		          ctx.lineWidth = ratio / 2;
+		          ctx.strokeStyle = 'rgba(0,0,0,' + (ratio + 0.2) + ')';
+		          ctx.moveTo(dot.x, dot.y);
+		          ctx.lineTo(d2.x, d2.y);
+		          ctx.stroke();
+		        }
+		      }
+		      // 将已经计算过的粒子从数组中删除
+		      ndots.splice(ndots.indexOf(dot), 1);
+		    });
+		    //animate();
+		    RAF(animate);
+		  }
+		</script>
+		
+	</body>
+</html>

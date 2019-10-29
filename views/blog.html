@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>blog</title>
+
+    <link rel="stylesheet" href="/static/css/basis.css">
+    <link rel="stylesheet" href="/static/css/geekerblog.css">
+    <link rel="stylesheet" href="/static/fonts/font-awesome/css/font-awesome.css">
+    
+    <link rel="stylesheet" href="/static/Plugin/Editor.md/css/editormd.css" />
+    <!-- <link rel="stylesheet" href="/static/Plugin/layui/css/layui.css"> -->
+    <link rel="stylesheet" href="/static/css/editor.css">
+
+</head>
+<body>
+    <div class="head">
+        <a class="head-logo-text" href="#">Geeker Blog</a>
+    </div>
+    <div class="content">
+        <div class="container">
+            <div class="article">
+                <p><br></p>
+                <h1 class="title" ><a href="#" id="title"></a></h1>
+                <article>
+                    <div id="time"></div>
+                        <div>
+                            
+                            <div id="content" class="markdown-body editormd-preview-container">
+                                    <!-- <textarea style="display:none;"></textarea>
+                                    <textarea style="display:none;"></textarea> -->
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="copyright">
+            <p>© 2019
+                <a href="http://geekerblog.com">Alex</a>, All rights reserved.
+            </p>
+        </div>
+    </footer>
+    <!-- <script src="/static/js/jquery-1.11.2.min.js"></script> -->
+    <!-- <script src="/static/Plugin/Editor.md/editormd.min.js"></script> -->
+    <script src="/static/js/common.js" charset="utf-8"></script>
+    <script>
+        // let editor = editormd("test-editor", {
+        //                 // width  : "800px",
+        //                 // height : "800px",
+        //                 path   : "/static/Plugin/Editor.md/lib/",
+        //                 saveHTMLToTextarea:true
+        // }); 
+
+        if("<%-uuid%>"!= ""){
+            let uuid="<%-uuid%>"
+            console.log("uuid   sdf",uuid)
+               
+                let url = "http://127.0.0.1:8090/open/articles/"+uuid; // 要请求的地址 
+                // let token = getCookie("token");
+                
+                ajax('GET', url, "token",null, function(data){
+                    // console.log(data.data[0].content_markdown );
+                    // editor.insertValue (data.data[0].content_markdown);
+                    // editor.insertValue (data.data[0].content_html);
+                    // editor.content_markdown  = data.data[0].content_markdown 
+                    
+                    document.getElementById("title").innerHTML = data.data[0].title;
+                    document.getElementById("content").innerHTML = data.data[0].content_html;
+                    let timestamp3 = data.data[0].update_time;
+                    let newDate = new Date();
+                    newDate.setTime(timestamp3 * 1000);
+                    let timeData = newDate.toDateString()
+                    document.getElementById("time").innerHTML = timeData;
+                    // document.getElementById("content").value = data.data[0].tag;
+
+                    
+                    // editor.hide();
+                    // console.log(data.data[0].content_markdown)
+                    // editor.insertValue(data.data[0].content_markdown);
+                    // editor.previewing();
+				});
+        }
+    </script>
+</body>
+</html>
