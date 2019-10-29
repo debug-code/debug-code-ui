@@ -75,7 +75,7 @@
         reloadData()
 
         function reloadData(){
-            url = 'http://localhost:8090/api/articles?offset=0&limit=10'
+            url = '/api/articles?offset=0&limit=10'
         
             
             // console.log("token",token)
@@ -95,7 +95,7 @@
                                 let offset = (obj.curr - 1) * 10
                                 let limit = offset + 10
                                 //alert(number)
-                                url = 'http://localhost:8090/api/articles?offset=' + offset + '&limit=' + limit
+                                url = '/api/articles?offset=' + offset + '&limit=' + limit
                                 ajax('GET', url,token, function(data){ 
                                         // console.info(data)
                                         $("#tableBody").empty();
@@ -195,7 +195,7 @@
 
         function del(uid) {
                     
-            let delUrl = 'http://localhost:8090/api/articles/'+uid;
+            let delUrl = '/api/articles/'+uid;
             ajax('DELETE', delUrl,token, function(data){
                 if (data["code"]== "1") {
                     layer.msg("删除成功",{

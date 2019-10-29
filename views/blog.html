@@ -59,7 +59,7 @@
             let uuid="<%-uuid%>"
             console.log("uuid   sdf",uuid)
                
-                let url = "http://127.0.0.1:8090/open/articles/"+uuid; // 要请求的地址 
+                let url = "/open/articles/"+uuid; // 要请求的地址 
                 // let token = getCookie("token");
                 
                 ajax('GET', url, "token",null, function(data){

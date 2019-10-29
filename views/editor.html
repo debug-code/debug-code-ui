@@ -36,7 +36,7 @@
             
             if("<%-uuid%>"!= ""){
                 let uuid="<%-uuid%>"
-                let url = "http://127.0.0.1:8090/api/articles/"+uuid; // 要请求的地址 
+                let url = "/api/articles/"+uuid; // 要请求的地址 
                 let token = getCookie("token");
                 
                 ajax('GET', url, token,null, function(data){
@@ -54,7 +54,7 @@
                 // console.log(editor.getHTML())
                 let title = document.getElementById("title").value;
                 let tag = document.getElementById("tag").value;
-                let url = "http://127.0.0.1:8090/api/articles"; // 要请求的地址 
+                let url = "/api/articles"; // 要请求的地址 
                 let token = getCookie("token");
                 let jsonData = JSON.stringify({
                     content_markdown:editor.getMarkdown(),
