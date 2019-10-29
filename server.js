@@ -95,71 +95,16 @@ app.get('/view/manage', function(req, res) {
   
 });
 
-//--------
-app.get('/data/userList', function(req, res) {
-  var pathname = 'views/alist.html';
-  fs.readFile(pathname,function(err, data) {
-    if(err) {
-      console.log(err);
-      //HTTP 状态码 404 ： NOT FOUND
-      //Content Type:text/plain
-      res.writeHead(404, {'Content-Type': 'text/html'});
-    }
-    else {
-      //HTTP 状态码 200 ： OK
-      res.writeHead(200, {'Content-Type': 'text/html'});
-      // response.writeHead(200);
-      res.write(data.toString())
-    }
-    //发送响应数据
-    res.send();
-  });
-  
-});
-app.get('/view/userList', function(req, res) {
-  var pathname = 'views/userList.html';
-  fs.readFile(pathname,function(err, data) {
-    if(err) {
-      console.log(err);
-      //HTTP 状态码 404 ： NOT FOUND
-      //Content Type:text/plain
-      res.writeHead(404, {'Content-Type': 'text/html'});
-    }
-    else {
-      //HTTP 状态码 200 ： OK
-      res.writeHead(200, {'Content-Type': 'text/html'});
-      // response.writeHead(200);
-      res.write(data.toString())
-    }
-    //发送响应数据
-    res.send();
-  });
-  
-});
-//----------
+
 
 app.get('/view/alist', function(req, res) {
-  // var pathname = 'views/alist.html';
-  res.writeHead(200, {'Content-Type': 'json'});
+  var pathname = 'alist.html';
   // response.writeHead(200);
-  
-  let result = [{
-    userName:"ss",
-    realName:"sss"
-    },
-    {
-      userName:"sas",
-      realName:"sssa"
-    }]
-    let r = {
-      code: 0,
-      msg: "",
-      count: 2,
-      data: result
-    } 
-  res.write(JSON.stringify(r))
+   
+  // res.write(JSON.stringify(r))
 
-  res.send();
+  // res.send();
+  res.render(pathname);
   
 });
 
