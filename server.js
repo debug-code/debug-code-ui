@@ -14,8 +14,10 @@ var cookieParser = require('cookie-parser');
 // respond with "hello world" when a GET request is made to the homepage
 
 app.set('view engine', 'ejs');
+
 //注册模板文件的后缀名为html，默认为ejs
 app.engine('html', ejs.__express);
+
 //设置模板文件存放的目录，默认是与app.js同级下views文件夹
 //path.join()用于路径拼接，可以根据当前的操作系统的类型正确选用文件路径拼接字符，linux是/,window是\
 app.set('views', path.join(__dirname, '/views'));

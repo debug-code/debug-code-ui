@@ -104,10 +104,10 @@
 
                                             var element = `<tr>
                                                 <td>`+ value["title"] + `</td>
-                                                <td>`+ value["type"] + `</td>
+                                                <td>`+ value["id"]  + `</td>
 
-                                                <td>`+ value["create_time"] + `</td>
-                                                <td>`+ value["id"] + `</td>
+                                                <td>`+value["type"]+ `</td>
+                                                <td>`+  value["create_time"] + `</td>
                                                 <td>
                                                     <a class="layui-btn" data-work="browse" data-id="`+ value["uid"] + `" href= "#"><i class="layui-icon layui-icon-read"></i></a>
                                                     <a class="layui-btn" data-work="edit" data-id="`+ value["uid"] + `" href= "#"><i class="layui-icon layui-icon-edit"></i></a>

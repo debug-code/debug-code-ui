@@ -37,3 +37,13 @@
 .next{
     cursor: pointer;
 }
+.footer{
+    position: absolute;
+    bottom: 0;
+}
+
+#icon-gh{
+    margin-bottom: -3px;
+    padding-top: 10px;
+    padding-right: 5px;
+}
